@@ -5,9 +5,11 @@ import uvicorn
 
 from backend.database import ping_database
 from backend.routers.health import router as health_router
-from backend.routers.pages import router as pages_router
 from backend.routers.auth import router as auth_router
-from backend.routers.admin_pages import router as admin_pages_router
+from backend.routers.life_notes import router as life_notes_router
+from backend.routers.admin_life_notes import router as admin_life_notes_router
+from backend.routers.works import router as works_router
+from backend.routers.admin_works import router as admin_works_router
 from backend.routers.upload import router as upload_router
 
 from fastapi.staticfiles import StaticFiles
@@ -21,9 +23,11 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan)
 app.include_router(health_router)
-app.include_router(pages_router)
 app.include_router(auth_router)
-app.include_router(admin_pages_router)
+app.include_router(life_notes_router)
+app.include_router(admin_life_notes_router)
+app.include_router(works_router)
+app.include_router(admin_works_router)
 app.include_router(upload_router)
 
 # 挂载静态文件目录
@@ -38,4 +42,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
