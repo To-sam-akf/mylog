@@ -41,18 +41,15 @@
       </header>
 
       <div v-if="status !== 'editing'" class="note-content">
-        <p v-if="content">{{ content }}</p>
+        <div v-if="content" class="rich-content" v-html="content"></div>
         <p v-else class="empty-text">这里还没有内容。</p>
       </div>
 
-      <!-- ↑ 取代 <h1>，变成一个文本输入框，多行文本输入控件  -->
-      <!-- `v-model` 的存在，会直接修改 `draftTitle` / `draftContent`，而 `title` / `content` __保持不变__。
- -->
-      <textarea
+      <RichEditor
         v-else
         v-model="draftContent"
-        class="note-editor"
-        aria-label="Life Notes content"
+        class="note-rich-editor"
+        placeholder="记录你的生活..."
       />
 
       <footer v-if="isAdmin" class="admin-footer">
@@ -74,6 +71,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import RichEditor from '@/components/RichEditor.vue'
 
 type PageStatus = 'loading' | 'view' | 'editing' | 'saving' | 'saved' | 'error'
 
@@ -93,6 +91,7 @@ const draftContent = ref('')
 const errorMessage = ref('')
 const saveError = ref('')
 
+// 从 localStorage 读取 token，根据 token 判断是否是管理员
 const token = computed(() => localStorage.getItem('adminToken') ?? localStorage.getItem('access_token') ?? '')
 const isAdmin = computed(() => Boolean(token.value))
 
@@ -293,7 +292,7 @@ async function saveLifeNotes() {
 
 .note-header,
 .note-content,
-.note-editor,
+.note-rich-editor,
 .admin-footer {
   position: relative;
   z-index: 1;
@@ -327,18 +326,85 @@ async function saveLifeNotes() {
   border: 3px solid #111111;
   border-radius: 8px;
   background: #fff4d6;
-  white-space: pre-wrap;
 }
 
-.note-content p {
-  margin: 0;
+.rich-content {
   color: #111111;
   font-size: 18px;
   line-height: 1.9;
 }
 
+.rich-content :deep(p) {
+  margin: 0 0 16px;
+}
+
+.rich-content :deep(p:last-child) {
+  margin-bottom: 0;
+}
+
+.rich-content :deep(h1),
+.rich-content :deep(h2),
+.rich-content :deep(h3) {
+  margin: 24px 0 12px;
+  color: #111111;
+  font-weight: 900;
+  line-height: 1.15;
+}
+
+.rich-content :deep(h1:first-child),
+.rich-content :deep(h2:first-child),
+.rich-content :deep(h3:first-child) {
+  margin-top: 0;
+}
+
+.rich-content :deep(h1) {
+  font-size: 34px;
+}
+
+.rich-content :deep(h2) {
+  font-size: 28px;
+}
+
+.rich-content :deep(h3) {
+  font-size: 22px;
+}
+
+.rich-content :deep(ul),
+.rich-content :deep(ol) {
+  margin: 0 0 16px;
+  padding-left: 28px;
+}
+
+.rich-content :deep(li) {
+  margin: 6px 0;
+}
+
+.rich-content :deep(blockquote) {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border-left: 5px solid #2ec4b6;
+  background: #ffffff;
+}
+
+.rich-content :deep(img) {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  margin: 18px 0;
+  border: 3px solid #111111;
+  border-radius: 8px;
+}
+
+.rich-content :deep(a) {
+  color: #005fcc;
+  font-weight: 900;
+}
+
 .empty-text {
+  margin: 0;
   color: #555555;
+  font-size: 18px;
+  line-height: 1.9;
 }
 
 .title-input,
